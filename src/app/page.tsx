@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01FreeIcons } from "@hugeicons/core-free-icons";
+import { Activity } from "react";
 
 const formSchema = z.object({
 	cep: z
@@ -79,40 +80,52 @@ export default function Home() {
       w-full max-w-[890px] min-h-[340px] mx-auto
     "
 				>
-					<div
-						className={`transition-opacity duration-300 gap-6 flex flex-col items-start ${
-							data ? "opacity-100" : "opacity-0"
-						}`}
-					>
-						<h1 className="flex items-center gap-2 font-bold text-xl md:text-2xl">
-							{data?.cep}
-							<HugeiconsIcon
-								icon={ArrowRight01FreeIcons}
-								size={24}
-								color="currentColor"
-								strokeWidth={1.5}
-							/>
-							{data?.uf}
-						</h1>
+					<Activity mode={data ? "visible" : "hidden"}>
+						<div
+							className={`transition-opacity duration-300 gap-6 flex flex-col items-start ${
+								data ? "opacity-100" : "opacity-0"
+							}`}
+						>
+							<h1 className="flex items-center gap-2 font-bold text-xl md:text-2xl">
+								{data?.cep}
+								<HugeiconsIcon
+									icon={ArrowRight01FreeIcons}
+									size={24}
+									color="currentColor"
+									strokeWidth={1.5}
+								/>
+								{data?.uf}
+							</h1>
 
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-zinc-200">
-							<span className="font-medium">Estado: {data?.estado}</span>
-							<span className="font-medium">Bairro: {data?.bairro}</span>
-							<span className="font-medium">Região: {data?.regiao}</span>
-							<span className="font-medium">Rua: {data?.logradouro}</span>
-							<span className="font-medium">DDD: {data?.ddd}</span>
-							<span className="font-medium">IBGE: {data?.ibge}</span>
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-zinc-200">
+								<span className="font-medium">Estado: {data?.estado}</span>
+								<span className="font-medium">Bairro: {data?.bairro}</span>
+								<span className="font-medium">Região: {data?.regiao}</span>
+								<span className="font-medium">Rua: {data?.logradouro}</span>
+								<span className="font-medium">DDD: {data?.ddd}</span>
+								<span className="font-medium">IBGE: {data?.ibge}</span>
+							</div>
 						</div>
-					</div>
 
-					<Link
-						href={`https://www.google.com/maps/search/${data?.cep}`}
-						target="_blank"
-					>
-						<button className="p-2 w-full bg-emerald-500 text-emerald-950 font-semibold rounded-xl cursor-pointer mt-6">
-							Ver no mapa
-						</button>
-					</Link>
+						<Link
+							href={`https://www.google.com/maps/search/${data?.cep}`}
+							target="_blank"
+						>
+							<button className="p-2 w-full bg-emerald-500 text-emerald-950 font-semibold rounded-xl cursor-pointer mt-6">
+								Ver no mapa
+							</button>
+						</Link>
+					</Activity>
+					<Activity mode={!data ? "visible" : "hidden"}>
+						<div className="flex flex-col items-center justify-center h-full">
+							<h2 className="text-xl font-semibold text-zinc-200">
+								Nenhum resultado encontrado
+							</h2>
+							<p className="text-zinc-400">
+								Verifique o CEP digitado e tente novamente.
+							</p>
+						</div>
+					</Activity>
 				</div>
 			</main>
 		</div>
