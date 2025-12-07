@@ -4,6 +4,7 @@ export type CepType = {
 	bairro: string;
 	estado: string;
 	uf: string;
+	regiao: string;
 	ibge: string;
 	ddd: number;
 };

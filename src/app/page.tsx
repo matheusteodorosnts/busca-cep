@@ -1,65 +1,120 @@
-import Image from "next/image";
+"use client";
+
+import { Header } from "@/components/Header";
+import useGetCep from "@/hooks/useGetCep";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01FreeIcons } from "@hugeicons/core-free-icons";
+
+const formSchema = z.object({
+	cep: z
+		.string()
+		.length(8, "CEP deve ter 8 dígitos")
+		.regex(/^\d+$/, "Apenas números")
+		.transform((val) => val.replace(/\D/g, "")),
+});
+
+type FormSchema = z.infer<typeof formSchema>;
 
 export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+	const {
+		register,
+		handleSubmit,
+		watch,
+		formState: { errors },
+	} = useForm<FormSchema>({
+		resolver: zodResolver(formSchema),
+		mode: "onChange",
+	});
+
+	const cepDigitado = watch("cep");
+	const { data } = useGetCep(cepDigitado || "");
+
+	return (
+		<div className="flex items-center justify-center min-h-screen px-4">
+			<header className="absolute top-0 w-full">
+				<Header />
+			</header>
+
+			<main className="flex flex-col items-center w-full">
+				<h1 className="text-2xl md:text-3xl font-bold text-center px-2">
+					Procure o seu <span className="text-emerald-600">CEP</span> pelo
+					Brasil todo<span className="text-emerald-600">.</span>
+				</h1>
+
+				<form
+					onSubmit={handleSubmit((data) => console.log(data))}
+					className="flex mt-3 w-full justify-center"
+				>
+					<div className="relative w-full max-w-[700px]">
+						<input
+							{...register("cep")}
+							placeholder="00000000"
+							maxLength={8}
+							className="
+            bg-zinc-100 text-zinc-950 px-4 py-3 text-lg border rounded-lg
+            w-full
+            focus:outline-none
+          "
+						/>
+
+						<button
+							type="submit"
+							className="
+            px-4 md:px-6 py-2 bg-emerald-500 text-emerald-950 rounded-lg cursor-pointer
+            absolute right-1 top-1 md:right-2 md:top-2 font-semibold text-sm md:text-base
+          "
+						>
+							Buscar
+						</button>
+					</div>
+				</form>
+
+				<div
+					className="
+      absolute -bottom-30 bg-zinc-900 rounded-3xl rounded-b-none p-6 md:p-10
+      w-full max-w-[890px] min-h-[340px] mx-auto
+    "
+				>
+					<div
+						className={`transition-opacity duration-300 gap-6 flex flex-col items-start ${
+							data ? "opacity-100" : "opacity-0"
+						}`}
+					>
+						<h1 className="flex items-center gap-2 font-bold text-xl md:text-2xl">
+							{data?.cep}
+							<HugeiconsIcon
+								icon={ArrowRight01FreeIcons}
+								size={24}
+								color="currentColor"
+								strokeWidth={1.5}
+							/>
+							{data?.uf}
+						</h1>
+
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-zinc-200">
+							<span className="font-medium">Estado: {data?.estado}</span>
+							<span className="font-medium">Bairro: {data?.bairro}</span>
+							<span className="font-medium">Região: {data?.regiao}</span>
+							<span className="font-medium">Rua: {data?.logradouro}</span>
+							<span className="font-medium">DDD: {data?.ddd}</span>
+							<span className="font-medium">IBGE: {data?.ibge}</span>
+						</div>
+					</div>
+
+					<Link
+						href={`https://www.google.com/maps/search/${data?.cep}`}
+						target="_blank"
+					>
+						<button className="p-2 w-full bg-emerald-500 text-emerald-950 font-semibold rounded-xl cursor-pointer mt-6">
+							Ver no mapa
+						</button>
+					</Link>
+				</div>
+			</main>
+		</div>
+	);
 }

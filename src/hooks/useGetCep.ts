@@ -13,6 +13,5 @@ export default function useGetCep(cep: string) {
 	return useQuery({
 		queryKey: ["cep", cep],
 		queryFn: getCep,
-		enabled: cep.length === 8,
 	});
 }
